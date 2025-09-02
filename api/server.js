@@ -18,7 +18,12 @@ connectDB();
 
 const app = express();
 app.use(express.json()); // to accept json data
-app.use(cors()); // to allow cross-origin requests
+app.use(cors({
+    origin: '*', // Allows all origins
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204
+})); // to allow cross-origin requests
 
 // API Routes
 app.use('/api/auth', authRoutes);
