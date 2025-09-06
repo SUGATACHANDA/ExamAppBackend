@@ -42,68 +42,68 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 // Setup for Socket.IO
-const server = http.createServer(app);
-const io = new Server(server, {
-    transports: ["websocket"],
-    cors: {
-        origin: "*", // In production, restrict this to your app's URL
-        methods: ["GET", "POST"]
-    },
-    pingInterval: 10000, // Ping interval in milliseconds
-    pingTimeout: 5000, // Ping timeout in milliseconds
-    cookie: false
-});
-app.set('io', io); // Make io accessible in controllers
+// const server = http.createServer(app);
+// const io = new Server(server, {
+//     transports: ["websocket"],
+//     cors: {
+//         origin: "*", // In production, restrict this to your app's URL
+//         methods: ["GET", "POST"]
+//     },
+//     pingInterval: 10000, // Ping interval in milliseconds
+//     pingTimeout: 5000, // Ping timeout in milliseconds
+//     cookie: false
+// });
+// app.set('io', io); // Make io accessible in controllers
 
-io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.id}`);
+// io.on('connection', (socket) => {
+//     console.log(`User connected: ${socket.id}`);
 
-    // --- Proctoring and WebRTC Signaling ---
+//     // --- Proctoring and WebRTC Signaling ---
 
-    // Teacher joins a room to monitor an exam
-    socket.on('join_proctoring_room', (examId) => {
-        const roomName = `exam_proctor_${examId}`;
-        socket.join(roomName);
-        console.log(`Teacher ${socket.id} joined proctoring room: ${roomName}`);
-    });
+//     // Teacher joins a room to monitor an exam
+//     socket.on('join_proctoring_room', (examId) => {
+//         const roomName = `exam_proctor_${examId}`;
+//         socket.join(roomName);
+//         console.log(`Teacher ${socket.id} joined proctoring room: ${roomName}`);
+//     });
 
-    // Student joins the same exam room to be monitored
-    socket.on('join_exam_room', ({ examId, studentId, studentName }) => {
-        const roomName = `exam_proctor_${examId}`;
-        socket.join(roomName);
-        console.log(`Student ${socket.id} (${studentName}) joined exam room: ${roomName}`);
+//     // Student joins the same exam room to be monitored
+//     socket.on('join_exam_room', ({ examId, studentId, studentName }) => {
+//         const roomName = `exam_proctor_${examId}`;
+//         socket.join(roomName);
+//         console.log(`Student ${socket.id} (${studentName}) joined exam room: ${roomName}`);
 
-        // Notify the teacher(s) in the room that a new student has joined
-        socket.to(roomName).emit('student_joined', { studentId, studentName, socketId: socket.id });
-    });
+//         // Notify the teacher(s) in the room that a new student has joined
+//         socket.to(roomName).emit('student_joined', { studentId, studentName, socketId: socket.id });
+//     });
 
-    // WebRTC Signaling: Teacher initiates connection to a student
-    socket.on('webrtc_offer', ({ offer, targetSocketId }) => {
-        // Send the offer to the specific student
-        io.to(targetSocketId).emit('webrtc_offer', { offer, fromSocketId: socket.id });
-    });
+//     // WebRTC Signaling: Teacher initiates connection to a student
+//     socket.on('webrtc_offer', ({ offer, targetSocketId }) => {
+//         // Send the offer to the specific student
+//         io.to(targetSocketId).emit('webrtc_offer', { offer, fromSocketId: socket.id });
+//     });
 
-    // WebRTC Signaling: Student sends answer back to teacher
-    socket.on('webrtc_answer', ({ answer, targetSocketId }) => {
-        // Send the answer back to the specific teacher
-        io.to(targetSocketId).emit('webrtc_answer', { answer, fromSocketId: socket.id });
-    });
+//     // WebRTC Signaling: Student sends answer back to teacher
+//     socket.on('webrtc_answer', ({ answer, targetSocketId }) => {
+//         // Send the answer back to the specific teacher
+//         io.to(targetSocketId).emit('webrtc_answer', { answer, fromSocketId: socket.id });
+//     });
 
-    // WebRTC Signaling: Exchanging ICE candidates
-    socket.on('webrtc_ice_candidate', ({ candidate, targetSocketId }) => {
-        io.to(targetSocketId).emit('webrtc_ice_candidate', { candidate, fromSocketId: socket.id });
-    });
+//     // WebRTC Signaling: Exchanging ICE candidates
+//     socket.on('webrtc_ice_candidate', ({ candidate, targetSocketId }) => {
+//         io.to(targetSocketId).emit('webrtc_ice_candidate', { candidate, fromSocketId: socket.id });
+//     });
 
-    // Teacher forces a student to be expelled
-    socket.on('expel_student', ({ studentSocketId }) => {
-        io.to(studentSocketId).emit('exam_expelled');
-        console.log(`Expel signal sent to student with socket ID: ${studentSocketId}`);
-    });
+//     // Teacher forces a student to be expelled
+//     socket.on('expel_student', ({ studentSocketId }) => {
+//         io.to(studentSocketId).emit('exam_expelled');
+//         console.log(`Expel signal sent to student with socket ID: ${studentSocketId}`);
+//     });
 
-    socket.on('disconnect', () => {
-        console.log(`User disconnected: ${socket.id}`);
-        // Optionally, emit an event to the room to notify that a user has disconnected
-    });
-});
+//     socket.on('disconnect', () => {
+//         console.log(`User disconnected: ${socket.id}`);
+//         // Optionally, emit an event to the room to notify that a user has disconnected
+//     });
+// });
 
 server.listen(PORT, console.log(`Server running on port ${PORT}`));
