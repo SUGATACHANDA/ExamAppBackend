@@ -44,10 +44,14 @@ const PORT = process.env.PORT || 5000;
 // Setup for Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
+    transports: ["websocket"],
     cors: {
         origin: "*", // In production, restrict this to your app's URL
         methods: ["GET", "POST"]
-    }
+    },
+    pingInterval: 10000, // Ping interval in milliseconds
+    pingTimeout: 5000, // Ping timeout in milliseconds
+    cookie: false
 });
 app.set('io', io); // Make io accessible in controllers
 
