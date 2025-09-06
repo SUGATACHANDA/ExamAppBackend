@@ -42,7 +42,7 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 // Setup for Socket.IO
-// const server = http.createServer(app);
+const server = http.createServer(app);
 // const io = new Server(server, {
 //     transports: ["websocket"],
 //     cors: {
