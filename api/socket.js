@@ -57,6 +57,17 @@ io.on('connection', (socket) => {
         console.log(`User disconnected: ${socket.id}`);
         // Optionally, emit an event to the room to notify that a user has disconnected
     });
+    socket.on('disconnecting', () => {
+        // `socket.rooms` is a Set which includes the socket's own ID.
+        // We find the room that isn't the socket's own ID.
+        const rooms = Array.from(socket.rooms);
+        const examRoom = rooms.find(room => room !== socket.id);
+
+        if (examRoom) {
+            // Notify everyone else in the room that this socket ID has left.
+            socket.to(examRoom).emit('peer_disconnected', socket.id);
+        }
+    });
 });
 
 export default (req, res) => {
